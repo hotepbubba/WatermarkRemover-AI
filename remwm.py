@@ -127,7 +127,7 @@ def process_video(input_path, output_path, florence_model, florence_processor, m
     else:
         output_file = output_path.with_suffix(f".{output_format.lower()}")
     
-    # Créer un fichier temporaire pour la vidéo sans audio
+    # Create a temporary file for the video without audio
     temp_dir = tempfile.mkdtemp()
     temp_video_path = Path(temp_dir) / f"temp_no_audio.{output_format.lower()}"
     
@@ -182,39 +182,39 @@ def process_video(input_path, output_path, florence_model, florence_processor, m
     cap.release()
     out.release()
     
-    # Combiner la vidéo traitée avec l'audio original à l'aide de FFmpeg
+    # Combine the processed video with the original audio using FFmpeg
     try:
-        logger.info("Fusion de la vidéo traitée avec l'audio original...")
+        logger.info("Merging the processed video with the original audio...")
         
-        # Vérifier si FFmpeg est disponible
+        # Check whether FFmpeg is available
         try:
             subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.STDOUT)
         except (subprocess.SubprocessError, FileNotFoundError):
-            logger.warning("FFmpeg n'est pas disponible. La vidéo sera produite sans audio.")
+            logger.warning("FFmpeg is not available. The video will be produced without audio.")
             shutil.copy(str(temp_video_path), str(output_file))
         else:
-            # Utiliser FFmpeg pour combiner la vidéo traitée avec l'audio original
+            # Use FFmpeg to combine the processed video with the original audio
             ffmpeg_cmd = [
                 "ffmpeg", "-y",
-                "-i", str(temp_video_path),  # Vidéo traitée sans audio
-                "-i", str(input_path),       # Vidéo originale avec audio
-                "-c:v", "copy",              # Copier la vidéo sans réencodage
-                "-c:a", "aac",               # Encoder l'audio en AAC pour meilleure compatibilité
-                "-map", "0:v:0",             # Utiliser la piste vidéo du premier fichier (vidéo traitée)
-                "-map", "1:a:0",             # Utiliser la piste audio du deuxième fichier (vidéo originale)
-                "-shortest",                  # Terminer quand la piste la plus courte se termine
+                "-i", str(temp_video_path),  # Processed video without audio
+                "-i", str(input_path),       # Original video with audio
+                "-c:v", "copy",              # Copy the video without re-encoding
+                "-c:a", "aac",               # Encode the audio to AAC for better compatibility
+                "-map", "0:v:0",             # Use the video track from the first file (processed video)
+                "-map", "1:a:0",             # Use the audio track from the second file (original video)
+                "-shortest",                  # Stop when the shortest stream ends
                 str(output_file)
             ]
             
-            # Exécuter FFmpeg
+            # Run FFmpeg
             subprocess.run(ffmpeg_cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            logger.info("Fusion audio/vidéo terminée avec succès!")
+            logger.info("Audio/video merge completed successfully!")
     except Exception as e:
-        logger.error(f"Erreur lors de la fusion audio/vidéo: {str(e)}")
-        # En cas d'erreur, utiliser la vidéo sans audio
+        logger.error(f"Error during audio/video merge: {str(e)}")
+        # If an error occurs, fall back to the video without audio
         shutil.copy(str(temp_video_path), str(output_file))
     finally:
-        # Nettoyer les fichiers temporaires
+        # Clean up temporary files
         try:
             os.remove(str(temp_video_path))
             os.rmdir(temp_dir)

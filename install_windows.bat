@@ -1,84 +1,84 @@
 @echo off
 echo ==================================
-echo  Installation de WatermarkRemover-AI
+echo  Installing WatermarkRemover-AI
 echo ==================================
 echo.
 
-REM Vérification de l'installation de Conda
+REM Check whether Conda is installed
 where conda >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo Conda n'est pas installé ou n'est pas dans le PATH.
-    echo Veuillez installer Miniconda ou Anaconda avant de continuer.
-    echo Téléchargez-le sur : https://docs.conda.io/en/latest/miniconda.html
+    echo Conda is not installed or not available in the PATH.
+    echo Please install Miniconda or Anaconda before continuing.
+    echo Download it from: https://docs.conda.io/en/latest/miniconda.html
     pause
     exit /b 1
 )
 
-echo Conda détecté. Vérifification de l'environnement...
+echo Conda detected. Checking the environment...
 echo.
 
-REM Vérification de l'existence de l'environnement
+REM Check whether the environment already exists
 conda env list | findstr /C:"py312aiwatermark" >nul
 if %ERRORLEVEL% EQU 0 (
-    echo L'environnement py312aiwatermark existe déjà.
-    choice /C YN /M "Voulez-vous le recréer? (Y/N)"
+    echo The py312aiwatermark environment already exists.
+    choice /C YN /M "Do you want to recreate it? (Y/N)"
     if %ERRORLEVEL% EQU 1 (
-        echo Suppression de l'ancien environnement...
+        echo Removing the previous environment...
         call conda env remove -n py312aiwatermark
     ) else (
-        echo Activation de l'environnement existant...
+        echo Activating the existing environment...
         goto ACTIVATION
     )
 )
 
-echo Création de l'environnement conda à partir du fichier environment.yml...
+echo Creating the Conda environment from environment.yml...
 call conda env create -f environment.yml
 if %ERRORLEVEL% NEQ 0 (
-    echo Erreur lors de la création de l'environnement.
+    echo Failed to create the environment.
     pause
     exit /b 1
 )
 
 :ACTIVATION
-echo Activation de l'environnement py312aiwatermark...
+echo Activating the py312aiwatermark environment...
 call conda activate py312aiwatermark
 if %ERRORLEVEL% NEQ 0 (
-    echo Erreur lors de l'activation de l'environnement.
+    echo Failed to activate the environment.
     pause
     exit /b 1
 )
 
-echo Installation des dépendances supplémentaires...
+echo Installing additional dependencies...
 pip install PyQt6 transformers iopaint opencv-python-headless
 if %ERRORLEVEL% NEQ 0 (
-    echo Erreur lors de l'installation des dépendances.
+    echo Failed to install the additional dependencies.
     pause
     exit /b 1
 )
 
-echo Téléchargement du modèle LaMA...
+echo Downloading the LaMa model...
 iopaint download --model lama
 if %ERRORLEVEL% NEQ 0 (
-    echo Avertissement: Erreur lors du téléchargement du modèle LaMA.
-    echo Vous pourrez réessayer plus tard avec la commande: iopaint download --model lama
+    echo Warning: An error occurred while downloading the LaMa model.
+    echo You can try again later with: iopaint download --model lama
 )
 
 echo.
 echo ===============================
-echo  Installation terminée!
+echo  Installation complete!
 echo ===============================
 echo.
-echo Pour lancer l'application:
-echo 1. Ouvrez une invite de commande
-echo 2. Activez l'environnement: conda activate py312aiwatermark
-echo 3. Lancez l'application: python remwmgui.py
+echo To launch the application:
+echo 1. Open a command prompt
+echo 2. Activate the environment: conda activate py312aiwatermark
+echo 3. Start the application: python remwmgui.py
 echo.
 
-choice /C YN /M "Voulez-vous lancer l'application maintenant? (Y/N)"
+choice /C YN /M "Do you want to launch the application now? (Y/N)"
 if %ERRORLEVEL% EQU 1 (
-    echo Lancement de l'application...
+    echo Starting the application...
     python remwmgui.py
 )
 
 echo.
-pause 
+pause
