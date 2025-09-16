@@ -1,117 +1,110 @@
 # WatermarkRemover-AI
 
-**Outil de suppression de filigranes alimenté par l'IA utilisant les modèles Florence-2 et LaMA**
+**AI-powered watermark removal tool built with the Florence-2 and LaMa models**
 
-![Exemple de suppression de filigrane](https://raw.githubusercontent.com/D-Ogi/WatermarkRemover-AI/main/docs/images/demo.jpg)
+![Watermark removal example](https://raw.githubusercontent.com/D-Ogi/WatermarkRemover-AI/main/docs/images/demo.jpg)
 
-## Aperçu
+## Overview
 
-`WatermarkRemover-AI` est une application de pointe qui utilise des modèles d'IA pour détecter et supprimer les filigranes de manière précise. Elle utilise Florence-2 de Microsoft pour identifier les filigranes et LaMA pour le remplissage naturel des régions supprimées. Le logiciel propose à la fois une interface en ligne de commande (CLI) et une interface graphique (GUI) basée sur PyQt6, le rendant accessible aux utilisateurs novices et avancés.
+`WatermarkRemover-AI` is a modern application that relies on AI models to detect and remove watermarks with precision. It uses Microsoft's Florence-2 model to locate watermarks and LaMa to naturally inpaint the removed regions. The software exposes both a command-line interface (CLI) and a PyQt6-based graphical user interface (GUI), making it approachable for new users and power users alike.
 
-## Caractéristiques
+## Features
 
-* **Modes multiples** : Traitez des fichiers individuels ou des dossiers entiers d'images et de vidéos.
-* **Détection avancée de filigranes** : Utilise la détection à vocabulaire ouvert de Florence-2 pour une identification précise des filigranes.
-* **Inpainting sans couture** : Emploie LaMA pour un remplissage de haute qualité et sensible au contexte.
-* **Support vidéo** : Traitement des fichiers vidéo image par image pour supprimer les filigranes.
-* **Sortie personnalisable** :  
-   * Configurez la taille maximale de la boîte englobante pour la détection des filigranes.  
-   * Définissez la transparence pour les régions de filigrane (images uniquement).  
-   * Forcez des formats de sortie spécifiques (PNG, WEBP, JPG pour les images; MP4, AVI pour les vidéos).
-* **Suivi de la progression** : Mises à jour de la progression en temps réel en mode GUI et CLI.
-* **Support du mode sombre** : L'interface graphique s'adapte automatiquement aux paramètres du mode sombre du système.
-* **Gestion efficace des ressources** : Optimisé pour l'accélération GPU à l'aide de CUDA (optionnel).
+* **Multiple modes** – Process single files or entire directories of images and videos.
+* **Advanced watermark detection** – Uses Florence-2 open-vocabulary detection for accurate identification.
+* **Seamless inpainting** – Employs LaMa for high-quality, context-aware filling of masked areas.
+* **Video support** – Processes video files frame by frame to remove watermarks.
+* **Customizable output** –
+  * Configure the maximum bounding-box size for watermark detection.
+  * Control transparency for watermark regions (images only).
+  * Force specific output formats (PNG, WEBP, JPG for images; MP4, AVI for videos).
+* **Progress tracking** – Real-time progress updates in both GUI and CLI modes.
+* **Dark mode support** – The GUI automatically adapts to the operating system theme.
+* **Efficient resource usage** – Optimized for GPU acceleration with CUDA (optional).
 
-## Installation rapide
+## Quick Installation
 
-Consultez le fichier [DEMARRAGE_RAPIDE.md](./DEMARRAGE_RAPIDE.md) pour une installation et une mise en route rapides.
+Check the [QUICK_START.md](./QUICK_START.md) file for a fast installation and setup guide.
 
-Pour une installation détaillée, référez-vous au fichier [INSTALLATION_FR.md](./INSTALLATION_FR.md).
+For a detailed walkthrough, read [INSTALLATION_GUIDE.md](./INSTALLATION_GUIDE.md).
 
-### Prérequis
+### Requirements
 
-* Conda/Miniconda installé.
-* CUDA (optionnel pour l'accélération GPU ; l'application fonctionne bien sur CPU également).
+* Conda/Miniconda installed.
+* CUDA (optional for GPU acceleration; the application also runs well on CPU).
 
-### Installation en un clic
+### One-click installation
 
-Exécutez le script PowerShell d'installation :
+Run the PowerShell installation script:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File install_windows.ps1
 ```
 
-Ce script installe automatiquement toutes les dépendances et télécharge le modèle LaMA nécessaire.
+This script installs every dependency and downloads the required LaMa model automatically.
 
-## Utilisation
+## Usage
 
-### Utilisation de l'interface graphique (GUI)
+### Using the graphical user interface (GUI)
 
-1. **Lancez l'application** avec :  
+1. **Launch the application**:
    ```
    conda activate py312aiwatermark
    python remwmgui.py
    ```
+2. **Configure the settings**:
+   * **Mode** – Choose "Process Single File" or "Process Directory".
+   * **Paths** – Browse for input and output locations.
+   * **Options** –
+     * Enable overwriting existing files.
+     * Enable transparency for watermark regions (images only).
+     * Adjust the maximum bounding-box size.
+   * **Output format** – Choose between PNG, WEBP, JPG for images, MP4, AVI for videos, or keep the original format.
+3. **Start processing**:
+   * Click "Start" to begin.
+   * Monitor progress updates and logs directly in the interface.
 
-2. **Configurez les paramètres** :  
-   * **Mode** : Sélectionnez "Process Single File" ou "Process Directory"  
-   * **Chemins** : Parcourez et définissez les répertoires d'entrée/sortie  
-   * **Options** : 
-     * Activer l'écrasement des fichiers existants
-     * Activer la transparence pour les régions de filigrane (images uniquement)
-     * Ajuster la taille maximale de la boîte englobante
-   * **Format de sortie** : Choisissez entre PNG, WEBP, JPG pour les images, MP4, AVI pour les vidéos, ou conserver le format d'origine
+### Command-line usage (CLI)
 
-3. **Commencez le traitement** :  
-   * Cliquez sur "Start" pour démarrer
-   * Surveillez la progression et les logs dans l'interface
-
-### Utilisation en ligne de commande (CLI)
-
-1. **Commande de base** :  
+1. **Basic command**:
    ```
-   python remwm.py chemin_entrée chemin_sortie
+   python remwm.py input_path output_path
    ```
-
-2. **Options** :  
-   * `--overwrite` : Écrase les fichiers existants
-   * `--transparent` : Rend les régions de filigrane transparentes (images uniquement)
-   * `--max-bbox-percent` : Définit la taille maximale de la boîte englobante (par défaut : 10%)
-   * `--force-format` : Force le format de sortie (PNG, WEBP, JPG pour les images; MP4, AVI pour les vidéos)
-
-3. **Exemples** :  
+2. **Options**:
+   * `--overwrite` – Overwrite existing files.
+   * `--transparent` – Make watermark regions transparent (images only).
+   * `--max-bbox-percent` – Maximum bounding-box size in percent (default: 10%).
+   * `--force-format` – Force the output format (PNG, WEBP, JPG for images; MP4, AVI for videos).
+3. **Examples**:
    ```
-   python remwm.py ./images_entrée ./images_sortie --overwrite --max-bbox-percent=15 --force-format=PNG
+   python remwm.py ./input_images ./output_images --overwrite --max-bbox-percent=15 --force-format=PNG
    ```
-   
    ```
-   python remwm.py ./video_entrée.mp4 ./video_sortie.mp4 --max-bbox-percent=15 --force-format=MP4
+   python remwm.py ./input_video.mp4 ./output_video.mp4 --max-bbox-percent=15 --force-format=MP4
    ```
 
-## Remarques sur la mise à niveau
+## Upgrade Notes
 
-Si vous avez déjà utilisé une version antérieure du dépôt, suivez ces étapes pour mettre à niveau :
+If you already used an older version of the repository, follow these steps to upgrade:
 
-1. **Mettez à jour le dépôt** :  
+1. **Update the repository**:
    ```
    git pull
    ```
-
-2. **Supprimez l'ancien environnement** :  
+2. **Remove the previous environment**:
    ```
    conda deactivate
    conda env remove -n py312
    ```
-
-3. **Exécutez le script d'installation** :  
+3. **Run the installation script**:
    ```
    powershell -ExecutionPolicy Bypass -File install_windows.ps1
    ```
 
-## Problèmes courants
+## Common Issues
 
-Consultez le fichier [INSTALLATION_FR.md](./INSTALLATION_FR.md) pour les solutions aux problèmes courants.
+Consult [INSTALLATION_GUIDE.md](./INSTALLATION_GUIDE.md) for solutions to frequent problems.
 
-## Licence
+## License
 
-Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails. 
+This project is licensed under the MIT License. See the LICENSE file for details.

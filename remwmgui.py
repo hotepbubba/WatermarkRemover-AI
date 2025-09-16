@@ -31,12 +31,12 @@ class Worker(QObject):
 
     def run(self):
         try:
-            # Créer un thread pour lire stderr
+            # Create a thread to read stderr
             error_thread = threading.Thread(target=self.read_stderr)
             error_thread.daemon = True
             error_thread.start()
             
-            # Lire stdout avec un timeout pour éviter les blocages
+            # Read stdout with a timeout to avoid blocking
             while self.running and self.process.poll() is None:
                 line = self.process.stdout.readline()
                 if line:
@@ -46,19 +46,19 @@ class Worker(QObject):
                             progress = int(line.strip().split("overall_progress:")[1].strip())
                             self.progress_signal.emit(progress)
                         except (ValueError, IndexError) as e:
-                            self.log_signal.emit(f"Erreur de parsing de la progression: {str(e)}")
+                            self.log_signal.emit(f"Progress parsing error: {str(e)}")
                 else:
-                    # Petite pause pour éviter d'utiliser trop de CPU
+                    # Small pause to avoid using too much CPU
                     time.sleep(0.1)
             
-            # Vérifier si le processus s'est terminé normalement
+            # Check whether the process finished normally
             if self.process.returncode is not None and self.process.returncode != 0:
-                self.error_signal.emit(f"Le processus s'est terminé avec le code d'erreur: {self.process.returncode}")
+                self.error_signal.emit(f"The process ended with error code: {self.process.returncode}")
                 
         except Exception as e:
-            self.error_signal.emit(f"Erreur dans le worker: {str(e)}")
+            self.error_signal.emit(f"Worker error: {str(e)}")
         finally:
-            # S'assurer que les flux sont fermés
+            # Ensure the streams are closed
             try:
                 self.process.stdout.close()
                 self.process.stderr.close()
@@ -67,11 +67,11 @@ class Worker(QObject):
             self.finished_signal.emit()
     
     def read_stderr(self):
-        """Lire stderr dans un thread séparé pour éviter les blocages"""
+        """Read stderr in a separate thread to avoid blocking"""
         try:
             for line in iter(self.process.stderr.readline, ""):
                 if line:
-                    self.log_signal.emit(f"ERREUR: {line}")
+                    self.log_signal.emit(f"ERROR: {line}")
         except:
             pass
 
@@ -297,14 +297,14 @@ class WatermarkRemoverGUI(QMainWindow):
             QMessageBox.warning(self, "Warning", "Transparency is not supported for videos. Continuing with non-transparent processing.")
             self.transparent_checkbox.setChecked(False)
             
-        # Vérifier si FFmpeg est disponible pour les vidéos
+        # Check whether FFmpeg is available for videos
         if is_video:
             ffmpeg_available = self.check_ffmpeg_available()
             if not ffmpeg_available:
                 response = QMessageBox.warning(
                     self, 
-                    "FFmpeg non disponible", 
-                    "FFmpeg n'est pas disponible sur votre système. Les vidéos traitées n'auront pas de son.\n\nVoulez-vous continuer quand même?",
+                    "FFmpeg not available", 
+                    "FFmpeg is not available on your system. Processed videos will not contain audio.\n\nDo you want to continue anyway?",
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                     QMessageBox.StandardButton.No
                 )
@@ -372,14 +372,14 @@ class WatermarkRemoverGUI(QMainWindow):
                 if self.worker:
                     self.worker.stop()
                 self.process.terminate()
-                # Donner un peu de temps au processus pour se terminer proprement
+                # Allow some time for the process to exit cleanly
                 QTimer.singleShot(500, lambda: self.force_kill_if_needed())
             except Exception as e:
-                logger.error(f"Erreur lors de l'arrêt du processus: {str(e)}")
+                logger.error(f"Error while stopping the process: {str(e)}")
                 self.reset_ui()
 
     def force_kill_if_needed(self):
-        """Force l'arrêt du processus s'il est encore en cours d'exécution"""
+        """Force the process to stop if it is still running"""
         if self.process and self.process.poll() is None:
             try:
                 self.process.kill()
@@ -445,22 +445,22 @@ class WatermarkRemoverGUI(QMainWindow):
                     self.radio_batch.setChecked(True)
 
     def handle_error(self, error_message):
-        """Gère les erreurs signalées par le worker"""
+        """Handle errors reported by the worker"""
         self.logs.append(f"<span style='color:red'>{error_message}</span>")
-        # Rendre les logs visibles en cas d'erreur
+        # Make the logs visible if an error occurs
         if not self.logs.isVisible():
             self.toggle_logs_button.setChecked(True)
             self.toggle_logs(True)
-        QMessageBox.critical(self, "Erreur", f"Une erreur est survenue: {error_message}")
+        QMessageBox.critical(self, "Error", f"An error occurred: {error_message}")
 
     def closeEvent(self, event):
         self.save_config()
         event.accept()
 
     def check_ffmpeg_available(self):
-        """Vérifie si FFmpeg est disponible sur le système"""
+        """Check whether FFmpeg is available on the system"""
         try:
-            # Essayer d'exécuter ffmpeg -version pour vérifier s'il est installé
+            # Try to run ffmpeg -version to confirm it is installed
             subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.STDOUT)
             return True
         except (subprocess.SubprocessError, FileNotFoundError):
